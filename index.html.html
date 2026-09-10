@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo — Daily Micro-Journal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f7f5f0;
+            --card-bg: #ffffff;
+            --text-primary: #1c1c1a;
+            --text-secondary: #706e66;
+            --accent: #b85d34;
+            --accent-hover: #9c4c28;
+            --accent-glow: rgba(184, 93, 52, 0.15);
+            --border: #e6e3da;
+            --gold: #d4a373;
+            --shadow-sm: 0 2px 8px rgba(28, 28, 26, 0.06);
+            --shadow: 0 20px 40px -15px rgba(28, 28, 26, 0.08);
+            --shadow-lg: 0 32px 64px -12px rgba(28, 28, 26, 0.12);
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-fast: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            --radius: 24px;
+            --radius-sm: 14px;
+            --radius-xs: 10px;
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #121210;
+            --card-bg: #1a1a17;
+            --text-primary: #f3f1ea;
+            --text-secondary: #9e9b90;
+            --accent: #d47a50;
+            --accent-hover: #e08c64;
+            --accent-glow: rgba(212, 122, 80, 0.2);
+            --border: #2a2a25;
+            --gold: #c29b68;
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+            --shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 32px 64px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 1rem 2rem;
+            transition: background-color 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                        color 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            animation: slideDown 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .logo {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 2.2rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            user-select: none;
+        }
+
+        .logo-dot {
+            color: var(--accent);
+            transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+        }
+
+        .icon-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .icon-btn:active {
+            transform: translateY(0);
+        }
+
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            width: 100%;
+            max-width: 540px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ===== JOURNAL CARD ===== */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            transition: background-color 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+                        border-color 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+            animation: cardAppear 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--gold), var(--accent));
+            opacity: 0.7;
+            border-radius: var(--radius) var(--radius) 0 0;
+        }
+
+        .date-badge {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: var(--text-secondary);
+            margin-bottom: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .date-badge::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            animation: pulse 2.5s ease-in-out infinite;
+        }
+
+        .prompt-text {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: clamp(1.6rem, 4vw, 2.1rem);
+            line-height: 1.25;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+            font-weight: 400;
+            transition: color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ===== EDITOR ===== */
+        .editor-container {
+            position: relative;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            background: var(--bg-color);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.1rem 1.25rem;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+            resize: none;
+            outline: none;
+            transition: var(--transition);
+            line-height: 1.7;
+            letter-spacing: 0.01em;
+        }
+
+        textarea::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        textarea:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: var(--card-bg);
+        }
+
+        .editor-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+        }
+
+        .word-counter {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: var(--transition-fast);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .word-counter .count-number {
+            font-weight: 700;
+            color: var(--text-primary);
+            transition: var(--transition-fast);
+            min-width: 1.8ch;
+            text-align: right;
+        }
+
+        .word-counter.near-limit .count-number {
+            color: var(--accent);
+        }
+
+        .word-counter.limit-reached {
+            color: var(--accent);
+        }
+
+        .word-counter.limit-reached .count-number {
+            color: var(--accent);
+            animation: shake 0.4s ease-out;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            padding: 0.7rem 1.4rem;
+            border-radius: var(--radius-xs);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 14px rgba(184, 93, 52, 0.3);
+            letter-spacing: 0.01em;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(184, 93, 52, 0.4);
+        }
+
+        .btn-primary:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* ===== LOCKED VIEW (deprecated — kept for migration) ===== */
+
+        /* ===== VAULT MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(18, 18, 16, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+            padding: 1rem;
+        }
+
+        .modal-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            width: 100%;
+            max-width: 560px;
+            max-height: 82vh;
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            flex-direction: column;
+            transform: translateY(24px) scale(0.97);
+            transition: var(--transition);
+        }
+
+        .modal-overlay.open .modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.7rem;
+            font-weight: 400;
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .vault-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            padding-right: 0.5rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
+        }
+
+        .vault-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .vault-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .vault-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .vault-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .vault-item:hover {
+            border-color: var(--accent);
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .vault-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.6rem;
+        }
+
+        .vault-item-date {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .vault-item-badge {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent);
+            background: var(--accent-glow);
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .vault-item-prompt {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-weight: 400;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            line-height: 1.4;
+        }
+
+        .vault-item-text {
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .empty-vault {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 3rem 1rem;
+            font-style: italic;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .empty-vault-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* ===== ROLLING CAROUSEL ===== */
+        .carousel-section {
+            width: 100%;
+            max-width: 540px;
+            margin-top: 2rem;
+            animation: fadeIn 1s ease-out 0.8s both;
+        }
+
+        .carousel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            padding: 0 0.25rem;
+        }
+
+        .carousel-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.05rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .carousel-title::before {
+            content: '';
+            display: inline-block;
+            width: 16px;
+            height: 1px;
+            background: var(--accent);
+        }
+
+        .carousel-count {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .carousel-viewport {
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            position: relative;
+            mask-image: linear-gradient(
+                to right,
+                transparent 0%,
+                black 4%,
+                black 96%,
+                transparent 100%
+            );
+            -webkit-mask-image: linear-gradient(
+                to right,
+                transparent 0%,
+                black 4%,
+                black 96%,
+                transparent 100%
+            );
+        }
+
+        .carousel-track {
+            display: flex;
+            gap: 0.75rem;
+            animation: scrollCarousel var(--scroll-duration, 30s) linear infinite;
+            width: max-content;
+        }
+
+        .carousel-track:hover {
+            animation-play-state: paused;
+        }
+
+        .carousel-card {
+            flex-shrink: 0;
+            width: 280px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.1rem;
+            cursor: default;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .carousel-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .carousel-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+
+        .carousel-card:hover::after {
+            opacity: 1;
+        }
+
+        .carousel-card-date {
+            font-size: 0.62rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+
+        .carousel-card-prompt {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            line-height: 1.35;
+            margin-bottom: 0.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .carousel-card-text {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            line-height: 1.5;
+            font-style: italic;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            position: relative;
+            padding-left: 0.75rem;
+            border-left: 2px solid var(--accent);
+        }
+
+        .carousel-empty {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+            background: var(--card-bg);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius-sm);
+        }
+
+        .carousel-empty-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.4;
+        }
+
+        .carousel-pause-indicator {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 2;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 600;
+        }
+
+        .carousel-viewport:hover .carousel-pause-indicator {
+            opacity: 1;
+        }
+
+        @keyframes scrollCarousel {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ===== MOOD TRACKER ===== */
+        .mood-chip {
+            font-size: 0.8rem;
+            background: var(--accent-glow);
+            border-radius: 20px;
+            padding: 0.15rem 0.6rem;
+            margin-left: 0.6rem;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        .seal-success {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--accent-glow);
+            border: 1px solid var(--accent);
+            border-radius: var(--radius-xs);
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            animation: fadeInScale 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .seal-success .mood-emoji {
+            font-size: 1.3rem;
+        }
+
+        .seal-success .seal-success-text {
+            flex: 1;
+        }
+
+        .seal-success .seal-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .mood-modal .vault-list {
+            padding-right: 0;
+        }
+
+        .mood-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+        }
+
+        .mood-table th,
+        .mood-table td {
+            padding: 0.8rem 0.75rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+
+        .mood-table th {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--text-secondary);
+            font-weight: 600;
+            border-bottom: 1.5px solid var(--border);
+        }
+
+        .mood-table td:first-child {
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .mood-table .mood-emoji-cell {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .mood-table .mood-label-cell {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .mood-table .mood-empty-cell {
+            color: var(--text-secondary);
+            font-style: italic;
+            opacity: 0.5;
+        }
+
+        .mood-table tr {
+            transition: background-color 0.3s ease;
+        }
+
+        .mood-table tbody tr:hover {
+            background: var(--accent-glow);
+        }
+
+        .mood-summary {
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 1.25rem;
+            text-align: left;
+            line-height: 1.6;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .mood-summary-title {
+            font-family: 'Instrument Serif', Georgia, serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .mood-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .mood-legend-item {
+            font-size: 0.72rem;
+            color: var(--text-secondary);
+            background: var(--bg-color);
+            border: 1px solid var(--border);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin-top: 2.5rem;
+            opacity: 0.6;
+            animation: fadeIn 1s ease-out 0.5s both;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-16px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(0.85); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-2px); }
+            40% { transform: translateX(2px); }
+            60% { transform: translateX(-1px); }
+            80% { transform: translateX(1px); }
+        }
+
+        @keyframes sealPop {
+            0% { transform: scale(0.8); opacity: 0; }
+            60% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .seal-anim {
+            animation: sealPop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            body {
+                padding: 1.25rem 0.75rem 1.5rem;
+            }
+
+            header {
+                margin-bottom: 2rem;
+            }
+
+            .card {
+                padding: 1.75rem;
+                border-radius: 20px;
+            }
+
+            .prompt-text {
+                font-size: 1.5rem;
+            }
+
+            textarea {
+                height: 130px;
+                padding: 1rem;
+            }
+
+            .modal {
+                padding: 1.5rem;
+                border-radius: 20px;
+                max-height: 85vh;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .logo {
+                font-size: 1.8rem;
+            }
+
+            .card {
+                padding: 1.5rem;
+            }
+
+            .prompt-text {
+                font-size: 1.35rem;
+            }
+        }
+
+        /* ===== PRINT HIDDEN ===== */
+        @media print {
+            body { display: none; }
+        }
+
+        /* ===== FOCUS VISIBLE ===== */
+        :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Echo<span class="logo-dot">.</span></div>
+        <div class="header-actions">
+            <button class="icon-btn" id="vault-btn" title="Open Time Capsule Vault" aria-label="Open vault">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </button>
+            <button class="icon-btn" id="mood-btn" title="Mood Tracker" aria-label="Mood tracker">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+            </button>
+            <button class="icon-btn" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle theme">
+                <svg id="theme-icon-sun" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                </svg>
+                <svg id="theme-icon-moon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:none;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="card" id="journal-card">
+            <div class="date-badge" id="current-date">Today's Reflection</div>
+            <h1 class="prompt-text" id="daily-prompt">Loading your daily prompt&hellip;</h1>
+
+            <div class="editor-container" id="editor-wrapper">
+                <textarea id="reflection-input" placeholder="Write your reflection here (max 50 words)..." aria-label="Journal entry"></textarea>
+                <div class="editor-footer">
+                    <div class="word-counter" id="word-count">
+                        <span class="count-number" id="count-number">0</span> / 50 words
+                    </div>
+                    <button class="btn-primary" id="seal-btn" disabled>Seal in Time Capsule</button>
+                </div>
+                <div id="seal-success-container"></div>
+            </div>
+        </div>
+    </main>
+
+    <section class="carousel-section" id="carousel-section">
+        <div class="carousel-header">
+            <div class="carousel-title">Recent Reflections</div>
+            <span class="carousel-count" id="carousel-count"></span>
+        </div>
+        <div class="carousel-viewport" id="carousel-viewport">
+            <div class="carousel-pause-indicator">Paused</div>
+            <div class="carousel-track" id="carousel-track"></div>
+        </div>
+    </section>
+
+    <footer>Distraction-Free Micro-Journaling</footer>
+
+    <div class="modal-overlay" id="vault-modal" role="dialog" aria-modal="true" aria-label="Time Capsule Vault">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Time Capsule Vault</h2>
+                <button class="modal-close" id="close-modal" aria-label="Close vault">&times;</button>
+            </div>
+            <div class="vault-list" id="vault-list"></div>
+        </div>
+    </div>
+
+    <div class="modal-overlay mood-modal" id="mood-modal" role="dialog" aria-modal="true" aria-label="Mood Tracker">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 class="modal-title">Weekly Mood Tracker</h2>
+                <button class="modal-close" id="close-mood-modal" aria-label="Close mood tracker">&times;</button>
+            </div>
+            <div class="mood-legend" id="mood-legend"></div>
+            <div class="vault-list" id="mood-list"></div>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            'use strict';
+
+            // ===== PROMPTS (30+) =====
+            const PROMPTS = [
+                "What is a small detail you noticed today that most people walked right past?",
+                "What sound brought you the most comfort or annoyance in the last 24 hours?",
+                "If you could freeze one fleeting moment from today into a photograph what would it look like?",
+                "What was the most unexpected texture or physical sensation you interacted with today?",
+                "What is a thought or worry you silently carried today that you didn't voice to anyone?",
+                "Which inanimate object around you right now has the most untold stories?",
+                "What micro-gesture of kindness did you witness or receive recently?",
+                "Describe a smell that instantly transported you to a different time in your life.",
+                "What color dominated your day and what feeling does it hold?",
+                "If your mood today were a weather pattern what would the forecast read?",
+                "What conversation replays itself in your mind when everything goes quiet?",
+                "Which word did you repeat the most today — spoken or thought?",
+                "What is one thing your hands created touched or held onto today?",
+                "If you could send a three-word message to your morning self what would it say?",
+                "What part of today felt the most real and what part felt like a dream?",
+                "Describe the last time you laughed so hard it caught you off guard.",
+                "What question did someone ask you today that you wish you had answered differently?",
+                "If your day had a title written on its spine like a book what would it be?",
+                "What sound or silence gave you a moment of unexpected peace?",
+                "Which stranger's face from today do you remember and why?",
+                "What did you avoid thinking about today and why did you choose avoidance?",
+                "If you could preserve one feeling from today in a jar which would it be?",
+                "What boundary did you honor or cross today that mattered?",
+                "Describe the last meal or drink that truly satisfied you — not just hunger.",
+                "What made today different from yesterday in a way no one else would notice?",
+                "If you could replay one five-minute stretch of today which would you choose?",
+                "What small act of rebellion rule-breaking or freedom did you indulge in?",
+                "What would the youngest version of you think of who you are right now?",
+                "What unfinished thought is still sitting at the edge of your mind?",
+                "If today were a piece of music what instrument would carry the melody?"
+            ];
+
+            // ===== MOOD DEFINITIONS =====
+            const MOODS = {
+                happy:    { emoji: '😊', label: 'Happy',     words: ['happy','joy','joyful','love','loved','grateful','gratitude','wonderful','amazing','great','good','beautiful','blessed','thankful','sunshine','laugh','laughed','smile','smiling','delight','delighted','thrilled','excited','cheerful','radiant','glowing','fantastic','awesome','perfect','blissful','ecstatic','elated'] },
+                content:  { emoji: '🙂', label: 'Content',   words: ['calm','peaceful','relaxed','comfortable','satisfied','steady','gentle','warm','quiet','still','settled','ease','okay','fine','nice','pleasant','smooth','cozy','safe','balanced','grounded','centered'] },
+                neutral:  { emoji: '😐', label: 'Neutral',   words: [] },
+                sad:      { emoji: '😔', label: 'Sad',       words: ['sad','unhappy','down','low','gloomy','melancholy','lonely','alone','missing','lost','empty','hollow','blue','grey','grief','grieving','heartbreak','heartbroken','crying','cried','tears','miserable','depressed','depression','hopeless','empty'] },
+                frustrated: { emoji: '😤', label: 'Frustrated', words: ['angry','anger','frustrated','frustration','annoyed','annoying','irritated','irritating','mad','furious','rage','upset','bitter','resentful','hostile','aggressive','furious','livid','infuriated','agitated'] },
+                anxious:  { emoji: '😰', label: 'Anxious',   words: ['anxious','anxiety','worried','worry','nervous','stressed','stress','tense','uneasy','restless','fear','afraid','scared','panicked','overwhelmed','dread','dreading','uncertain','paranoid','jittery','shaking'] },
+                tired:    { emoji: '😴', label: 'Tired',     words: ['tired','exhausted','drained','sleepy','fatigue','fatigued','weary','burned','burnout','worn','sluggish','heavy','lazy','slow','unmotivated','foggy','blurry','zzz'] }
+            };
+
+            const MOOD_PRIORITY = ['happy','content','neutral','sad','frustrated','anxious','tired'];
+
+            // ===== CONSTANTS =====
+            const STORAGE_KEY = 'echo_entries_v3';
+            const THEME_KEY = 'echo_theme';
+            const TODAY = new Date();
+            const TODAY_KEY = TODAY.toDateString();
+
+            // ===== DOM REFS =====
+            const $ = (id) => document.getElementById(id);
+            const textarea = $('reflection-input');
+            const countNumber = $('count-number');
+            const wordCountEl = $('word-count');
+            const sealBtn = $('seal-btn');
+            const promptEl = $('daily-prompt');
+            const dateBadge = $('current-date');
+            const editorWrapper = $('editor-wrapper');
+            const sealSuccessContainer = $('seal-success-container');
+            const vaultModal = $('vault-modal');
+            const vaultBtn = $('vault-btn');
+            const closeModalBtn = $('close-modal');
+            const vaultList = $('vault-list');
+            const moodBtn = $('mood-btn');
+            const moodModal = $('mood-modal');
+            const closeMoodModalBtn = $('close-mood-modal');
+            const moodList = $('mood-list');
+            const moodLegend = $('mood-legend');
+            const themeToggle = $('theme-toggle');
+            const sunIcon = $('theme-icon-sun');
+            const moonIcon = $('theme-icon-moon');
+
+            // ===== HELPERS =====
+            function getEntries() {
+                try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+                catch { return []; }
+            }
+
+            function saveEntries(entries) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+            }
+
+            function getDailyPrompt() {
+                const start = new Date(TODAY.getFullYear(), 0, 0);
+                const diff = TODAY - start;
+                const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+                return PROMPTS[((dayOfYear % PROMPTS.length) + PROMPTS.length) % PROMPTS.length];
+            }
+
+            function formatDate(date) {
+                return new Intl.DateTimeFormat('en-US', {
+                    weekday: 'long', month: 'short', day: 'numeric', year: 'numeric'
+                }).format(date);
+            }
+
+            function formatDateShort(date) {
+                return new Intl.DateTimeFormat('en-US', {
+                    month: 'short', day: 'numeric'
+                }).format(date);
+            }
+
+            function escapeHtml(str) {
+                const div = document.createElement('div');
+                div.textContent = str;
+                return div.innerHTML;
+            }
+
+            // ===== SENTIMENT ANALYSIS =====
+            function analyzeMood(text) {
+                if (!text || !text.trim()) return 'neutral';
+                const lower = text.toLowerCase();
+                const words = lower.split(/\W+/);
+                const scores = {};
+
+                MOOD_PRIORITY.forEach(m => scores[m] = 0);
+
+                words.forEach(word => {
+                    MOOD_PRIORITY.forEach(mood => {
+                        if (MOODS[mood].words.includes(word)) {
+                            scores[mood]++;
+                        }
+                    });
+                });
+
+                let bestMood = 'neutral';
+                let bestScore = 0;
+                MOOD_PRIORITY.forEach(mood => {
+                    if (scores[mood] > bestScore) {
+                        bestScore = scores[mood];
+                        bestMood = mood;
+                    }
+                });
+
+                return bestMood;
+            }
+
+            function getMoodInfo(moodKey) {
+                return MOODS[moodKey] || MOODS.neutral;
+            }
+
+            // ===== MIGRATE OLD ENTRIES (add mood if missing) =====
+            function migrateEntries() {
+                const entries = getEntries();
+                let changed = false;
+                entries.forEach(e => {
+                    if (!e.mood) {
+                        e.mood = analyzeMood(e.content);
+                        changed = true;
+                    }
+                });
+                if (changed) saveEntries(entries);
+                return entries;
+            }
+
+            // ===== DATE & PROMPT =====
+            dateBadge.textContent = formatDate(TODAY);
+            const activePrompt = getDailyPrompt();
+            promptEl.textContent = activePrompt;
+
+            // ===== WORD COUNT =====
+            function countWords(text) {
+                const trimmed = text.trim();
+                if (!trimmed) return 0;
+                return trimmed.split(/\s+/).filter(w => w.length > 0).length;
+            }
+
+            textarea.addEventListener('input', () => {
+                const count = countWords(textarea.value);
+                countNumber.textContent = count;
+
+                wordCountEl.classList.remove('near-limit', 'limit-reached');
+
+                if (count > 50) {
+                    wordCountEl.classList.add('limit-reached');
+                    sealBtn.disabled = true;
+                } else if (count >= 40) {
+                    wordCountEl.classList.add('near-limit');
+                    sealBtn.disabled = count === 0;
+                } else {
+                    sealBtn.disabled = count === 0;
+                }
+            });
+
+            // ===== SEAL ENTRY =====
+            sealBtn.addEventListener('click', () => {
+                const text = textarea.value.trim();
+                const count = countWords(text);
+                if (count === 0 || count > 50) return;
+
+                const mood = analyzeMood(text);
+                const entry = {
+                    date: formatDate(TODAY),
+                    dateKey: TODAY_KEY,
+                    prompt: activePrompt,
+                    content: text,
+                    mood: mood,
+                    timestamp: Date.now()
+                };
+
+                const entries = getEntries();
+                entries.unshift(entry);
+                saveEntries(entries);
+
+                // Show success toast
+                const moodInfo = getMoodInfo(mood);
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+                sealSuccessContainer.innerHTML = `
+                    <div class="seal-success">
+                        <span class="mood-emoji">${moodInfo.emoji}</span>
+                        <div class="seal-success-text">
+                            Sealed! Mood: <strong>${moodInfo.label}</strong>
+                            <div class="seal-time">${timeStr}</div>
+                        </div>
+                    </div>`;
+
+                // Clear textarea for next entry
+                textarea.value = '';
+                countNumber.textContent = '0';
+                wordCountEl.classList.remove('near-limit', 'limit-reached');
+                sealBtn.disabled = true;
+                textarea.focus();
+
+                // Fade out toast after 3s
+                setTimeout(() => {
+                    const toast = sealSuccessContainer.querySelector('.seal-success');
+                    if (toast) {
+                        toast.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        toast.style.opacity = '0';
+                        toast.style.transform = 'translateY(-8px)';
+                        setTimeout(() => { sealSuccessContainer.innerHTML = ''; }, 600);
+                    }
+                }, 3000);
+
+                // Refresh carousel and today count
+                setTimeout(() => renderCarousel(), 100);
+                updateTodayCount();
+            });
+
+            // ===== TODAY'S ENTRY COUNT =====
+            function updateTodayCount() {
+                const entries = getEntries();
+                const todayEntries = entries.filter(e => e.dateKey === TODAY_KEY);
+                if (todayEntries.length > 0) {
+                    dateBadge.textContent = formatDate(TODAY) + ' — ' + todayEntries.length + ' today';
+                } else {
+                    dateBadge.textContent = formatDate(TODAY);
+                }
+            }
+
+            // ===== VAULT =====
+            function renderVault() {
+                const entries = getEntries();
+                vaultList.innerHTML = '';
+
+                if (entries.length === 0) {
+                    vaultList.innerHTML = `
+                        <div class="empty-vault">
+                            <div class="empty-vault-icon">⏳</div>
+                            Your time capsule is empty.<br>Seal your first daily prompt to begin.
+                        </div>`;
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment();
+
+                entries.forEach((entry) => {
+                    const moodInfo = getMoodInfo(entry.mood);
+                    const item = document.createElement('div');
+                    item.className = 'vault-item';
+                    item.innerHTML = `
+                        <div class="vault-item-header">
+                            <span class="vault-item-date">${escapeHtml(entry.date)}</span>
+                            <span class="vault-item-badge">${moodInfo.emoji} ${moodInfo.label}</span>
+                        </div>
+                        <div class="vault-item-prompt">${escapeHtml(entry.prompt)}</div>
+                        <div class="vault-item-text">\u201C${escapeHtml(entry.content)}\u201D</div>
+                    `;
+                    fragment.appendChild(item);
+                });
+
+                vaultList.appendChild(fragment);
+            }
+
+            function openVault() {
+                renderVault();
+                vaultModal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeVault() {
+                vaultModal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            vaultBtn.addEventListener('click', openVault);
+            closeModalBtn.addEventListener('click', closeVault);
+            vaultModal.addEventListener('click', (e) => { if (e.target === vaultModal) closeVault(); });
+
+            // ===== MOOD TRACKER =====
+            function renderMoodLegend() {
+                moodLegend.innerHTML = '';
+                MOOD_PRIORITY.forEach(key => {
+                    const m = MOODS[key];
+                    const item = document.createElement('span');
+                    item.className = 'mood-legend-item';
+                    item.textContent = m.emoji + ' ' + m.label;
+                    moodLegend.appendChild(item);
+                });
+            }
+
+            function renderMoodModal() {
+                const entries = migrateEntries();
+                const moodListEl = moodList;
+                moodListEl.innerHTML = '';
+                renderMoodLegend();
+
+                // Build last 7 days
+                const days = [];
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(TODAY);
+                    d.setDate(d.getDate() - i);
+                    const key = d.toDateString();
+                    const dayEntries = entries.filter(e => e.dateKey === key);
+                    days.push({
+                        date: d,
+                        dateKey: key,
+                        label: i === 0 ? 'Today' : i === 1 ? 'Yesterday' : formatDateShort(d),
+                        entries: dayEntries,
+                        mood: dayEntries.length > 0 ? getDominantMood(dayEntries) : null
+                    });
+                }
+
+                // Build table
+                const table = document.createElement('table');
+                table.className = 'mood-table';
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th>Day</th>
+                            <th>Mood</th>
+                            <th>Feeling</th>
+                            <th>Entries</th>
+                        </tr>
+                    </thead>
+                `;
+                const tbody = document.createElement('tbody');
+
+                const moodCounts = {};
+                MOOD_PRIORITY.forEach(m => moodCounts[m] = 0);
+
+                days.forEach(day => {
+                    const tr = document.createElement('tr');
+                    const moodInfo = day.mood ? getMoodInfo(day.mood) : null;
+
+                    if (moodInfo && day.mood !== 'neutral') {
+                        moodCounts[day.mood] = (moodCounts[day.mood] || 0) + 1;
+                    }
+
+                    tr.innerHTML = `
+                        <td>${day.label}</td>
+                        <td class="mood-emoji-cell">${moodInfo ? moodInfo.emoji : '—'}</td>
+                        <td class="${moodInfo ? 'mood-label-cell' : 'mood-empty-cell'}">${moodInfo ? moodInfo.label : 'No entries'}</td>
+                        <td class="${day.entries.length === 0 ? 'mood-empty-cell' : ''}">${day.entries.length}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                table.appendChild(tbody);
+                moodListEl.appendChild(table);
+
+                // Summary
+                const summary = buildMoodSummary(days, moodCounts);
+                const summaryEl = document.createElement('div');
+                summaryEl.className = 'mood-summary';
+                summaryEl.innerHTML = `
+                    <div class="mood-summary-title">This Week's Reflection</div>
+                    <p>${summary}</p>
+                `;
+                moodListEl.appendChild(summaryEl);
+            }
+
+            function getDominantMood(dayEntries) {
+                const counts = {};
+                dayEntries.forEach(e => {
+                    const m = e.mood || 'neutral';
+                    counts[m] = (counts[m] || 0) + 1;
+                });
+                let best = 'neutral';
+                let bestCount = 0;
+                Object.keys(counts).forEach(m => {
+                    if (counts[m] > bestCount) { bestCount = counts[m]; best = m; }
+                });
+                return best;
+            }
+
+            function buildMoodSummary(days, moodCounts) {
+                const totalEntries = days.reduce((s, d) => s + d.entries.length, 0);
+                const daysWithEntries = days.filter(d => d.entries.length > 0).length;
+
+                if (totalEntries === 0) {
+                    return "No entries this week. Start journaling to discover your emotional patterns and gain deeper self-awareness.";
+                }
+
+                const positiveScore = (moodCounts.happy || 0) + (moodCounts.content || 0);
+                const negativeScore = (moodCounts.sad || 0) + (moodCounts.frustrated || 0) + (moodCounts.anxious || 0) + (moodCounts.tired || 0);
+                const neutralScore = moodCounts.neutral || 0;
+
+                let message = '';
+
+                if (positiveScore > negativeScore && positiveScore > neutralScore) {
+                    message = `A predominantly positive week! You logged ${totalEntries} reflection${totalEntries > 1 ? 's' : ''} across ${daysWithEntries} day${daysWithEntries > 1 ? 's' : ''}. `;
+                    if (moodCounts.happy > 0) message += `Joy showed up ${moodCounts.happy} time${moodCounts.happy > 1 ? 's' : ''}. `;
+                    if (moodCounts.content > 0) message += `Peace and contentment visited ${moodCounts.content} time${moodCounts.content > 1 ? 's' : ''}. `;
+                    message += "Keep nurturing what brings you light.";
+                } else if (negativeScore > positiveScore) {
+                    message = `This was a more challenging week with ${totalEntries} reflection${totalEntries > 1 ? 's' : ''}. `;
+                    if (moodCounts.sad > 0) message += `Sadness appeared ${moodCounts.sad} time${moodCounts.sad > 1 ? 's' : ''}. `;
+                    if (moodCounts.anxious > 0) message += `Anxiety visited ${moodCounts.anxious} time${moodCounts.anxious > 1 ? 's' : ''}. `;
+                    if (moodCounts.frustrated > 0) message += `Frustration showed ${moodCounts.frustrated} time${moodCounts.frustrated > 1 ? 's' : ''}. `;
+                    message += "Be gentle with yourself. Every difficult day is still a day you showed up.";
+                } else if (totalEntries <= 2) {
+                    message = `You wrote ${totalEntries} reflection${totalEntries > 1 ? 's' : ''} this week. Consistent journaling builds self-awareness — even one entry makes a difference.`;
+                } else {
+                    message = `A beautifully balanced week with ${totalEntries} reflection${totalEntries > 1 ? 's' : ''} across ${daysWithEntries} day${daysWithEntries > 1 ? 's' : ''}. `;
+                    message += "Life rarely stays in one emotional lane. Recognizing that range is its own kind of wisdom.";
+                }
+
+                return message;
+            }
+
+            function openMood() {
+                renderMoodModal();
+                moodModal.classList.add('open');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeMood() {
+                moodModal.classList.remove('open');
+                document.body.style.overflow = '';
+            }
+
+            moodBtn.addEventListener('click', openMood);
+            closeMoodModalBtn.addEventListener('click', closeMood);
+            moodModal.addEventListener('click', (e) => { if (e.target === moodModal) closeMood(); });
+
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (moodModal.classList.contains('open')) closeMood();
+                    if (vaultModal.classList.contains('open')) closeVault();
+                }
+            });
+
+            // ===== THEME =====
+            function setTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'block';
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    sunIcon.style.display = 'block';
+                    moonIcon.style.display = 'none';
+                }
+                localStorage.setItem(THEME_KEY, theme);
+            }
+
+            const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
+            setTheme(savedTheme);
+
+            themeToggle.addEventListener('click', () => {
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                setTheme(isDark ? 'light' : 'dark');
+            });
+
+            // ===== ROLLING CAROUSEL =====
+            const carouselTrack = $('carousel-track');
+            const carouselCount = $('carousel-count');
+
+            function renderCarousel() {
+                const entries = getEntries();
+                carouselTrack.innerHTML = '';
+
+                if (entries.length === 0) {
+                    carouselTrack.innerHTML = `
+                        <div class="carousel-empty">
+                            <div class="carousel-empty-icon">✦</div>
+                            Seal your first entry to see it roll here
+                        </div>`;
+                    carouselTrack.style.animation = 'none';
+                    carouselCount.textContent = '';
+                    return;
+                }
+
+                carouselCount.textContent = `${entries.length} sealed`;
+
+                const buildCard = (entry) => {
+                    const moodInfo = getMoodInfo(entry.mood);
+                    const card = document.createElement('div');
+                    card.className = 'carousel-card';
+                    card.innerHTML = `
+                        <div class="carousel-card-date">${escapeHtml(entry.date)} <span class="mood-chip">${moodInfo.emoji} ${moodInfo.label}</span></div>
+                        <div class="carousel-card-prompt">${escapeHtml(entry.prompt)}</div>
+                        <div class="carousel-card-text">\u201C${escapeHtml(entry.content)}\u201D</div>
+                    `;
+                    return card;
+                };
+
+                entries.forEach(entry => carouselTrack.appendChild(buildCard(entry)));
+
+                // Duplicate for seamless loop
+                if (entries.length > 1) {
+                    entries.forEach(entry => carouselTrack.appendChild(buildCard(entry)));
+                }
+
+                const speed = Math.max(20, entries.length * 8);
+                carouselTrack.style.setProperty('--scroll-duration', `${speed}s`);
+
+                if (entries.length <= 1) {
+                    carouselTrack.style.animation = 'none';
+                    carouselTrack.style.transform = 'translateX(0)';
+                } else {
+                    carouselTrack.style.animation = '';
+                }
+            }
+
+            // ===== INIT =====
+            migrateEntries();
+            renderCarousel();
+            updateTodayCount();
+
+            // ===== AUTO-FOCUS =====
+            setTimeout(() => textarea.focus(), 600);
+        })();
+    </script>
+</body>
+</html>
